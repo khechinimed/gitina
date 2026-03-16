@@ -2,22 +2,57 @@
   "name": "gitina",
   "displayName": "gitina",
   "description": "Gitina automatically changes the editor interface color based on the current Git branch.",
+  "publisher": "khechini mohamed",
   "version": "0.0.1",
   "engines": {
-    "vscode": "^1.110.0"
+    "vscode": "^1.80.0"
   },
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "workspaceContains:.git",
+    "onStartupFinished"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "gitina.helloWorld",
-        "title": "Hello World"
+        "command": "gitBranchColor.refresh",
+        "title": "Gitina Color Branch: Refresh"
+      },
+      {
+        "command": "gitBranchColor.addRule",
+        "title": "Gitina Color Branch: Add Branch Color Rule"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Gitina Color Branch",
+      "properties": {
+        "gitBranchColor.rules": {
+          "type": "array",
+          "default": [
+            {
+              "pattern": "^main$",
+              "color": "#444444"
+            },
+            {
+              "pattern": "^develop$",
+              "color": "#2ecc71"
+            },
+            {
+              "pattern": "^feature/.*",
+              "color": "#f1c40f"
+            },
+            {
+              "pattern": "^hotfix/.*",
+              "color": "#e74c3c"
+            }
+          ],
+          "description": "Regex rules mapping git branches to colors"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
