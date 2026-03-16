@@ -18,12 +18,20 @@
   "contributes": {
     "commands": [
       {
-        "command": "gitBranchColor.refresh",
-        "title": "Gitina Color Branch: Refresh"
+        "command": "gitBranchColor.addRule",
+        "title": "Git Branch Color: Add Rule"
       },
       {
-        "command": "gitBranchColor.addRule",
-        "title": "Gitina Color Branch: Add Branch Color Rule"
+        "command": "gitBranchColor.removeRule",
+        "title": "Git Branch Color: Remove Rule"
+      },
+      {
+        "command": "gitBranchColor.listRules",
+        "title": "Git Branch Color: List Rules"
+      },
+      {
+        "command": "gitBranchColor.refresh",
+        "title": "Git Branch Color: Refresh"
       }
     ],
     "configuration": {

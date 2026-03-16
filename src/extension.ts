@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { exec } from "child_process";
+import { COLOR_PALETTE } from "./colorPalette";
 
 let lastBranch: string | undefined;
 
@@ -42,6 +43,166 @@ function applyColor(color: string) {
       colors,
       vscode.ConfigurationTarget.Workspace,
     );
+}
+
+type BranchRuleOption = vscode.QuickPickItem & {
+ mode: "preset" | "branchName" | "customRegex"
+ pattern?: string
+}
+
+function escapeRegExp(value: string): string {
+ return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+}
+
+async function pickColor(): Promise<string | undefined> {
+
+ const selected = await vscode.window.showQuickPick(
+  COLOR_PALETTE.map(c => ({
+   label: c,
+   description: "Preview",
+   detail: `Color ${c}`
+  })),
+  {
+   placeHolder: "Pick a color for this branch"
+  }
+ )
+
+ return selected?.label
+}
+
+async function addRuleWizard() {
+
+ const branchType = await vscode.window.showQuickPick<BranchRuleOption>([
+  { label: "main", description: "Main production branch", mode: "preset", pattern: "^main$" },
+  { label: "develop", description: "Development branch", mode: "preset", pattern: "^develop$" },
+  { label: "release/*", description: "Release branches", mode: "preset", pattern: "^release\\/.*$" },
+  { label: "feature/*", description: "Feature branches", mode: "preset", pattern: "^feature\\/.*$" },
+  { label: "hotfix/*", description: "Hotfix branches", mode: "preset", pattern: "^hotfix\\/.*$" },
+  { label: "bugfix/*", description: "Bugfix branches", mode: "preset", pattern: "^bugfix\\/.*$" },
+  { label: "chore/*", description: "Maintenance branches", mode: "preset", pattern: "^chore\\/.*$" },
+  { label: "refactor/*", description: "Refactor branches", mode: "preset", pattern: "^refactor\\/.*$" },
+  { label: "docs/*", description: "Documentation branches", mode: "preset", pattern: "^docs\\/.*$" },
+  { label: "test/*", description: "Test branches", mode: "preset", pattern: "^test\\/.*$" },
+  { label: "branch name", description: "Type an exact branch name", mode: "branchName" },
+  { label: "custom regex", description: "Custom regex pattern", mode: "customRegex" }
+ ], {
+  placeHolder: "Select branch type"
+ })
+
+ if (!branchType) return
+
+ let pattern = branchType.pattern || ""
+ let displayPattern = branchType.label
+
+ if (branchType.mode === "branchName") {
+
+  const branchName = await vscode.window.showInputBox({
+   prompt: "Enter branch name",
+   placeHolder: "example: sprint-42"
+  })
+
+  if (!branchName) return
+
+  displayPattern = branchName
+  pattern = `^${escapeRegExp(branchName)}$`
+ }
+
+ if (branchType.mode === "customRegex") {
+
+  const custom = await vscode.window.showInputBox({
+   prompt: "Enter regex for branch"
+  })
+
+  if (!custom) return
+
+  displayPattern = custom
+  pattern = custom
+ }
+
+ if (!pattern) return
+
+ const color = await pickColor()
+
+ if (!color) return
+
+ const config = vscode.workspace.getConfiguration("gitBranchColor")
+
+ const rules = config.get<any[]>("rules") || []
+
+ rules.push({
+  pattern,
+  color
+ })
+
+ await config.update(
+  "rules",
+  rules,
+  vscode.ConfigurationTarget.Global
+ )
+
+ vscode.window.showInformationMessage(
+  `Rule added: ${displayPattern} → ${color}`
+ )
+
+}
+
+async function removeRuleUI() {
+
+ const config = vscode.workspace.getConfiguration("gitBranchColor")
+
+ const rules = config.get<any[]>("rules") || []
+
+ if (rules.length === 0) {
+  vscode.window.showInformationMessage("No rules configured")
+  return
+ }
+
+ const pick = await vscode.window.showQuickPick(
+
+  rules.map((r, i) => ({
+   label: r.pattern,
+   description: r.color,
+   index: i
+  })),
+
+  {
+   placeHolder: "Select rule to remove"
+  }
+
+ )
+
+ if (!pick) return
+
+ rules.splice(pick.index, 1)
+
+ await config.update(
+  "rules",
+  rules,
+  vscode.ConfigurationTarget.Global
+ )
+
+ vscode.window.showInformationMessage("Rule removed")
+}
+
+async function listRulesUI() {
+
+ const config = vscode.workspace.getConfiguration("gitBranchColor")
+
+ const rules = config.get<any[]>("rules") || []
+
+ if (rules.length === 0) {
+  vscode.window.showInformationMessage("No rules configured")
+  return
+ }
+
+ const items = rules.map(r => ({
+  label: r.pattern,
+  description: r.color
+ }))
+
+ vscode.window.showQuickPick(items, {
+  placeHolder: "Configured branch color rules"
+ })
 }
 
 async function updateColor() {
@@ -124,7 +285,17 @@ export function activate(context: vscode.ExtensionContext) {
 
   const addRuleCommand = vscode.commands.registerCommand(
     "gitBranchColor.addRule",
-    addRuleUI
+    addRuleWizard
+  );
+
+  const removeRuleCommand = vscode.commands.registerCommand(
+    "gitBranchColor.removeRule",
+    removeRuleUI
+  );
+
+  const listRulesCommand = vscode.commands.registerCommand(
+    "gitBranchColor.listRules",
+    listRulesUI
   );
 
   const configListener = vscode.workspace.onDidChangeConfiguration((e) => {
@@ -133,7 +304,7 @@ export function activate(context: vscode.ExtensionContext) {
     }
   });
 
-  context.subscriptions.push(watcher, refreshCommand, addRuleCommand, configListener);
+  context.subscriptions.push(watcher, refreshCommand, addRuleCommand, removeRuleCommand, listRulesCommand, configListener);
 }
 
 export function deactivate() {}
