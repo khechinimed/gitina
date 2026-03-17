@@ -211,6 +211,6 @@ Initial release — branch coloring, sidebar overview, add/remove rules, sensiti
 
 <div align="center">
 
-Made with ☕ by [khechini mohamed](https://github.com/khechini)
+Made with ☕ by [khechini mohamed](https://github.com/khechinimed/)
 
 </div>
