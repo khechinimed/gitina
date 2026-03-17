@@ -8,6 +8,7 @@ export type BranchRuleOption = vscode.QuickPickItem & {
 export type BranchColorRule = {
  pattern: string
  color: string
+ enabled?: boolean
 }
 
 export type ColorPickOption = vscode.QuickPickItem & {

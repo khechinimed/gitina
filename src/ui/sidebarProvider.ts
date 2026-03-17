@@ -5,6 +5,25 @@ import { getColorSwatchIcon, normalizeHexColor } from "../theme/themeService";
 const ACTIONS_GROUP_ID = "gitinaActionsGroup";
 const RULES_GROUP_ID = "gitinaRulesGroup";
 
+export class RuleTreeItem extends vscode.TreeItem {
+   constructor(
+      public readonly ruleIndex: number,
+      public readonly rule: BranchColorRule,
+   ) {
+      super(rule.pattern, vscode.TreeItemCollapsibleState.None);
+      const normalizedColor = normalizeHexColor(rule.color);
+      const isDisabled = rule.enabled === false;
+      this.description = isDisabled
+         ? `${normalizedColor || rule.color} (disabled)`
+         : normalizedColor || rule.color;
+      this.tooltip = `${rule.pattern} → ${normalizedColor || rule.color}${isDisabled ? " [disabled]" : ""}`;
+      this.iconPath = isDisabled
+         ? new vscode.ThemeIcon("eye-closed", new vscode.ThemeColor("disabledForeground"))
+         : getColorSwatchIcon(normalizedColor);
+      this.contextValue = isDisabled ? "gitinaRuleDisabled" : "gitinaRuleEnabled";
+   }
+}
+
 export class GitinaSidebarProvider
    implements vscode.TreeDataProvider<vscode.TreeItem>
 {
@@ -16,15 +35,18 @@ export class GitinaSidebarProvider
    private branch: string | undefined;
    private color: string | undefined;
    private rules: BranchColorRule[] = [];
+   private isSensitive = false;
 
    setState(state: {
       branch?: string;
       color?: string;
       rules: BranchColorRule[];
+      isSensitive?: boolean;
    }) {
       this.branch = state.branch;
       this.color = state.color;
       this.rules = state.rules;
+      this.isSensitive = state.isSensitive ?? false;
       this.onDidChangeTreeDataEmitter.fire();
    }
 
@@ -44,7 +66,7 @@ export class GitinaSidebarProvider
             return [emptyRulesItem];
          }
 
-         return this.rules.map((rule) => createSidebarRuleItem(rule));
+         return this.rules.map((rule, index) => new RuleTreeItem(index, rule));
       }
 
       if (element?.id === ACTIONS_GROUP_ID) {
@@ -82,7 +104,12 @@ export class GitinaSidebarProvider
          vscode.TreeItemCollapsibleState.None,
       );
       branchItem.description = this.branch || "No branch";
-      branchItem.iconPath = new vscode.ThemeIcon("git-branch");
+      branchItem.iconPath = this.isSensitive
+         ? new vscode.ThemeIcon("alert", new vscode.ThemeColor("problemsWarningIcon.foreground"))
+         : new vscode.ThemeIcon("git-branch");
+      branchItem.tooltip = this.isSensitive
+         ? `⚠️ Sensitive branch: ${this.branch}`
+         : `Branch: ${this.branch || "No branch"}`;
 
       const colorItem = new vscode.TreeItem(
          "Active color",
@@ -142,20 +169,6 @@ function createSidebarActionItem(
       title: label,
       command: commandId,
    };
-
-   return item;
-}
-
-function createSidebarRuleItem(rule: BranchColorRule): vscode.TreeItem {
-   const normalizedColor = normalizeHexColor(rule.color);
-   const item = new vscode.TreeItem(
-      rule.pattern,
-      vscode.TreeItemCollapsibleState.None,
-   );
-
-   item.description = normalizedColor || rule.color;
-   item.tooltip = `${rule.pattern} -> ${normalizedColor || rule.color}`;
-   item.iconPath = getColorSwatchIcon(normalizedColor);
 
    return item;
 }

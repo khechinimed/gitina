@@ -26,14 +26,24 @@ export function updateBranchStatus(
  statusItem: vscode.StatusBarItem | undefined,
  branch: string,
  color: string,
+ isSensitive = false,
 ) {
  if (!statusItem) return;
 
  const icon = getStatusBarIcon();
  const themeColor = getStatusBarTextThemeColor();
 
- statusItem.text = icon ? `${icon} ${branch}` : branch;
- statusItem.tooltip = `Current branch: ${branch} (${color})`;
- statusItem.color = themeColor ? new vscode.ThemeColor(themeColor) : undefined;
+ if (isSensitive) {
+  statusItem.text = `$(alert) ${branch}`;
+  statusItem.tooltip = `⚠️ Sensitive branch: ${branch} (${color})`;
+  statusItem.backgroundColor = new vscode.ThemeColor("statusBarItem.warningBackground");
+  statusItem.color = undefined;
+ } else {
+  statusItem.text = icon ? `${icon} ${branch}` : branch;
+  statusItem.tooltip = `Current branch: ${branch} (${color})`;
+  statusItem.color = themeColor ? new vscode.ThemeColor(themeColor) : undefined;
+  statusItem.backgroundColor = undefined;
+ }
+
  statusItem.show();
 }

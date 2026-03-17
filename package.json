@@ -52,6 +52,28 @@
           "command": "gitBranchColor.removeRule",
           "when": "view == gitBranchColor.sidebarView",
           "group": "navigation@2"
+        },
+        {
+          "command": "gitBranchColor.exportProfile",
+          "when": "view == gitBranchColor.sidebarView",
+          "group": "navigation@3"
+        },
+        {
+          "command": "gitBranchColor.importProfile",
+          "when": "view == gitBranchColor.sidebarView",
+          "group": "navigation@3"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "gitBranchColor.disableRule",
+          "when": "view == gitBranchColor.sidebarView && viewItem == gitinaRuleEnabled",
+          "group": "inline"
+        },
+        {
+          "command": "gitBranchColor.enableRule",
+          "when": "view == gitBranchColor.sidebarView && viewItem == gitinaRuleDisabled",
+          "group": "inline"
         }
       ]
     },
@@ -83,6 +105,26 @@
           "light": "media/commands/refresh.svg",
           "dark": "media/commands/refresh.svg"
         }
+      },
+      {
+        "command": "gitBranchColor.disableRule",
+        "title": "Disable rule",
+        "icon": "$(eye-closed)"
+      },
+      {
+        "command": "gitBranchColor.enableRule",
+        "title": "Enable rule",
+        "icon": "$(eye)"
+      },
+      {
+        "command": "gitBranchColor.exportProfile",
+        "title": "Git Branch Color: Export Team Profile",
+        "icon": "$(export)"
+      },
+      {
+        "command": "gitBranchColor.importProfile",
+        "title": "Git Branch Color: Import Team Profile",
+        "icon": "$(import)"
       }
     ],
     "configuration": {
@@ -119,6 +161,17 @@
           "type": "string",
           "default": "",
           "description": "Theme color token used for branch text in status bar (example: editor.foreground or statusBar.foreground). Leave empty to use the default status bar text color."
+        },
+        "gitBranchColor.sensitiveBranchesEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show a visual warning alert when working on a sensitive branch (e.g. main, production, release)."
+        },
+        "gitBranchColor.sensitiveBranches": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": ["main", "production", "release"],
+          "description": "List of branch name patterns (regex anchored to full name) considered sensitive. A warning alert will be shown in the status bar and sidebar."
         }
       }
     }

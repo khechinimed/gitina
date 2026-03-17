@@ -5,8 +5,9 @@ import {
   removeRuleUI,
 } from "./commands/rulesCommands";
 import { getBranch } from "./services/gitService";
-import { getConfiguredRules } from "./services/rulesService";
-import { GitinaSidebarProvider } from "./ui/sidebarProvider";
+import { getConfiguredRules, getAllRules, toggleRule } from "./services/rulesService";
+import { exportProfile, importProfile } from "./services/teamProfileService";
+import { GitinaSidebarProvider, RuleTreeItem } from "./ui/sidebarProvider";
 import { updateBranchStatus } from "./ui/statusBar";
 import { applyColor } from "./theme/themeService";
 
@@ -17,19 +18,20 @@ let sidebarProvider: GitinaSidebarProvider | undefined;
 
 async function updateColor(force = false) {
   const branch = await getBranch();
-  const rules = getConfiguredRules();
+  const activeRules = getConfiguredRules();
+  const allRules = getAllRules();
 
   if (!branch) {
     branchStatusItem?.hide();
     sidebarProvider?.setState({
-      rules,
+      rules: allRules,
     });
     return;
   }
 
   let color = "#444444";
 
-  for (const rule of rules) {
+  for (const rule of activeRules) {
     try {
       const regex = new RegExp(rule.pattern);
 
@@ -40,11 +42,14 @@ async function updateColor(force = false) {
     } catch {}
   }
 
-  updateBranchStatus(branchStatusItem, branch, color);
+  const isSensitive = isSensitiveBranch(branch);
+
+  updateBranchStatus(branchStatusItem, branch, color, isSensitive);
   sidebarProvider?.setState({
     branch,
     color,
-    rules,
+    rules: allRules,
+    isSensitive,
   });
 
   if (!force && branch === lastBranch && color === lastColor) return;
@@ -53,6 +58,15 @@ async function updateColor(force = false) {
   lastColor = color;
 
   await applyColor(color);
+}
+
+function isSensitiveBranch(branch: string): boolean {
+  const config = vscode.workspace.getConfiguration("gitBranchColor");
+  if (!config.get<boolean>("sensitiveBranchesEnabled", true)) return false;
+  const patterns = config.get<string[]>("sensitiveBranches", ["main", "production", "release"]);
+  return patterns.some((p) => {
+    try { return new RegExp(`^${p}$`).test(branch); } catch { return branch === p; }
+  });
 }
 
 export function activate(context: vscode.ExtensionContext) {
@@ -103,6 +117,35 @@ export function activate(context: vscode.ExtensionContext) {
     },
   );
 
+  const disableRuleCommand = vscode.commands.registerCommand(
+    "gitBranchColor.disableRule",
+    async (item: RuleTreeItem) => {
+      await toggleRule(item.ruleIndex);
+      await updateColor(true);
+    },
+  );
+
+  const enableRuleCommand = vscode.commands.registerCommand(
+    "gitBranchColor.enableRule",
+    async (item: RuleTreeItem) => {
+      await toggleRule(item.ruleIndex);
+      await updateColor(true);
+    },
+  );
+
+  const exportProfileCommand = vscode.commands.registerCommand(
+    "gitBranchColor.exportProfile",
+    exportProfile,
+  );
+
+  const importProfileCommand = vscode.commands.registerCommand(
+    "gitBranchColor.importProfile",
+    async () => {
+      await importProfile();
+      await updateColor(true);
+    },
+  );
+
   const listRulesCommand = vscode.commands.registerCommand(
     "gitBranchColor.listRules",
     listRulesUI
@@ -121,6 +164,10 @@ export function activate(context: vscode.ExtensionContext) {
     refreshCommand,
     addRuleCommand,
     removeRuleCommand,
+    disableRuleCommand,
+    enableRuleCommand,
+    exportProfileCommand,
+    importProfileCommand,
     listRulesCommand,
     configListener,
   );
