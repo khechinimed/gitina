@@ -1,71 +1,216 @@
-# gitina README
+<div align="center">
 
-This is the README for your extension "gitina". After writing up a brief description, we recommend including the following sections.
+# Gitina
 
-## Features
+**Automatically color your VS Code interface based on your current Git branch.**
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+> Stay aware of where you are. Never accidentally push to `main` again.
 
-For example if there is an image subfolder under your extension project workspace:
+![VS Code](https://img.shields.io/badge/VS%20Code-%5E1.80.0-blue?style=flat-square&logo=visual-studio-code)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178c6?style=flat-square&logo=typescript)
+![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
 
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
-
-## Requirements
-
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
-
-## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
+</div>
 
 ---
 
-## Following extension guidelines
+## What is Gitina?
 
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
+Gitina watches your active Git branch and instantly changes the VS Code status bar color to match a rule you defined. At a glance, you know:
 
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
+- 🟡 You're on a feature branch
+- 🔴 You're on a hotfix branch
+- ⚠️ You're on `main` — the editor shows a warning alert
 
-## Working with Markdown
+No configuration required to get started. Rules are stored in your VS Code settings and survive restarts.
 
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
+---
 
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
+## Features
 
-## For more information
+### 🎨 Branch → Color Rules
 
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+Define regex patterns that map to colors. The first matching rule wins.
 
-**Enjoy!**
+```
+^main$       →  #444444  (dark grey)
+^develop$    →  #2ecc71  (green)
+^feature/.*  →  #f1c40f  (yellow)
+^hotfix/.*   →  #e74c3c  (red)
+```
+
+The status bar background and the editor's `workbench.colorCustomizations` update automatically every time you switch branch.
+
+---
+
+### ⚠️ Sensitive Branch Alerts
+
+When you're on a branch considered sensitive (`main`, `production`, `release` by default), Gitina shows a **visual warning** so you never forget:
+
+- Status bar turns orange with a `⚠` icon
+- Sidebar shows an alert icon next to the branch name
+
+You can customize the list of sensitive branches or disable the feature entirely in settings.
+
+---
+
+### 🗂️ Sidebar Overview
+
+Open the **Gitina panel** in the Activity Bar for a full overview:
+
+| Section | What you'll see |
+|---|---|
+| **Current branch** | Active branch name + warning icon if sensitive |
+| **Active color** | Hex code + live color swatch |
+| **Rules configured** | All rules, expandable, with color swatches |
+| **Actions** | Refresh, Add rule, Remove rule |
+
+**Disable / Enable a rule** directly from the sidebar — hover a rule row and click the eye icon to toggle it without deleting it. Disabled rules appear greyed out with a closed eye icon.
+
+---
+
+### 👥 Team Profile (Share Your Rules)
+
+Share your branch color setup with your entire team:
+
+- **Export** — saves your rules to a `.gitinarc.json` file  
+- **Import** — loads rules from any `.gitinarc.json` file  
+
+Commit that file to your repository and every developer runs the same color scheme.
+
+```json
+// .gitinarc.json
+{
+  "rules": [
+    { "pattern": "^main$", "color": "#e74c3c" },
+    { "pattern": "^develop$", "color": "#2ecc71" },
+    { "pattern": "^feature/.*", "color": "#f1c40f" },
+    { "pattern": "^hotfix/.*", "color": "#c0392b" }
+  ]
+}
+```
+
+---
+
+## Commands
+
+All commands are available via the **Command Palette** (`⌘ Shift P` / `Ctrl Shift P`) and the Gitina sidebar toolbar.
+
+| Command | Description |
+|---|---|
+| `Git Branch Color: Add Rule` | Launch the wizard to create a new rule |
+| `Git Branch Color: Remove Rule` | Pick and delete an existing rule |
+| `Git Branch Color: List Rules` | Display all configured rules |
+| `Git Branch Color: Refresh` | Re-apply colors to the current branch |
+| `Git Branch Color: Export Team Profile` | Save rules to `.gitinarc.json` |
+| `Git Branch Color: Import Team Profile` | Load rules from `.gitinarc.json` |
+
+---
+
+## Settings
+
+All settings live under the `gitBranchColor.*` namespace in your VS Code settings.
+
+| Setting | Type | Default | Description |
+|---|---|---|---|
+| `gitBranchColor.rules` | `array` | *(4 default rules)* | Regex-to-color mapping rules |
+| `gitBranchColor.statusBarIcon` | `string` | `""` | Icon prefix in the status bar. Accepts codicons (`$(git-branch)`) or emoji. Leave empty to hide. |
+| `gitBranchColor.statusBarTextThemeColor` | `string` | `""` | VS Code theme color token for status bar text (e.g. `statusBar.foreground`). Leave empty for default. |
+| `gitBranchColor.sensitiveBranchesEnabled` | `boolean` | `true` | Enable/disable the sensitive branch alert. |
+| `gitBranchColor.sensitiveBranches` | `array` | `["main", "production", "release"]` | Branch name patterns (regex) that trigger the warning alert. |
+
+### Rule format
+
+Each entry in `gitBranchColor.rules` is an object:
+
+```jsonc
+{
+  "pattern": "^feature/.*",  // JavaScript regex
+  "color": "#f1c40f",        // Hex color string
+  "enabled": true            // Optional. false = rule is disabled
+}
+```
+
+### Example configuration
+
+```jsonc
+// settings.json
+"gitBranchColor.statusBarIcon": "$(git-branch)",
+"gitBranchColor.sensitiveBranches": ["main", "master", "production"],
+"gitBranchColor.rules": [
+  { "pattern": "^main$",       "color": "#e74c3c" },
+  { "pattern": "^master$",     "color": "#e74c3c" },
+  { "pattern": "^develop$",    "color": "#2ecc71" },
+  { "pattern": "^release/.*",  "color": "#9b59b6" },
+  { "pattern": "^feature/.*",  "color": "#f1c40f" },
+  { "pattern": "^hotfix/.*",   "color": "#e67e22" },
+  { "pattern": "^chore/.*",    "color": "#95a5a6" }
+]
+```
+
+---
+
+## How rules are matched
+
+- Rules are evaluated **top to bottom**
+- The **first matching rule** wins — order matters
+- Patterns are standard **JavaScript regular expressions**
+- Disabled rules (`"enabled": false`) are skipped entirely
+
+---
+
+## Data & persistence
+
+| Data | Storage location |
+|---|---|
+| Rules & settings | `~/Library/Application Support/Code/User/settings.json` (macOS) |
+| Active branch | Read from `git rev-parse` at runtime — not stored |
+| Active color | Re-applied from rules on every branch switch |
+| Team profile | `.gitinarc.json` in your project — you choose where |
+
+Gitina only writes to VS Code's standard settings. It never touches your code, your git history, or any system files.
+
+---
+
+## ⚠️ Behavior & Permissions
+
+Gitina modifies the **`workbench.colorCustomizations`** entry in your VS Code settings to change the visual appearance of the editor interface (status bar, title bar, activity bar) based on your current Git branch.
+
+**What this means in practice:**
+
+- Every time you switch branch, Gitina writes the matched color into `workbench.colorCustomizations` in your global `settings.json`
+- This is the only setting Gitina writes to — it never touches your code, your git history, or any other configuration
+- If no rule matches, the last applied color remains (a manual Refresh will re-evaluate)
+
+**To reset colors at any time:**
+
+```jsonc
+// Remove or clear this block in your settings.json
+"workbench.colorCustomizations": {}
+```
+
+Or run **Git Branch Color: Refresh** from the Command Palette after removing all rules.
+
+> If you share your machine or use a synced VS Code profile, be aware that these color changes will be visible to others using the same profile.
+
+---
+
+## Requirements
+
+- VS Code `^1.80.0`
+- A workspace with a `.git` folder (the extension activates automatically)
+
+---
+
+## Release Notes
+
+### 0.0.1
+Initial release — branch coloring, sidebar overview, add/remove rules, sensitive branch alerts, disable/enable rules, team profile export/import.
+
+---
+
+<div align="center">
+
+Made with ☕ by [khechini mohamed](https://github.com/khechini)
+
+</div>
