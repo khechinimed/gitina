@@ -15,15 +15,62 @@
     "onStartupFinished"
   ],
   "main": "./out/extension.js",
+  "icon": "media/sidebar-icon.png",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "gitBranchColorSidebar",
+          "title": "Gitina",
+          "icon": "media/sidebar-icon.png"
+        }
+      ]
+    },
+    "views": {
+      "gitBranchColorSidebar": [
+        {
+          "id": "gitBranchColor.sidebarView",
+          "name": "Overview",
+          "contextualTitle": "Gitina",
+          "icon": "media/sidebar-icon.png"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "gitBranchColor.refresh",
+          "when": "view == gitBranchColor.sidebarView",
+          "group": "navigation@1"
+        },
+        {
+          "command": "gitBranchColor.addRule",
+          "when": "view == gitBranchColor.sidebarView",
+          "group": "navigation@1"
+        },
+        {
+          "command": "gitBranchColor.removeRule",
+          "when": "view == gitBranchColor.sidebarView",
+          "group": "navigation@2"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "gitBranchColor.addRule",
-        "title": "Git Branch Color: Add Rule"
+        "title": "Git Branch Color: Add Rule",
+        "icon": {
+          "light": "media/commands/add.svg",
+          "dark": "media/commands/add.svg"
+        }
       },
       {
         "command": "gitBranchColor.removeRule",
-        "title": "Git Branch Color: Remove Rule"
+        "title": "Git Branch Color: Remove Rule",
+        "icon": {
+          "light": "media/commands/remove.svg",
+          "dark": "media/commands/remove.svg"
+        }
       },
       {
         "command": "gitBranchColor.listRules",
@@ -31,7 +78,11 @@
       },
       {
         "command": "gitBranchColor.refresh",
-        "title": "Git Branch Color: Refresh"
+        "title": "Git Branch Color: Refresh",
+        "icon": {
+          "light": "media/commands/refresh.svg",
+          "dark": "media/commands/refresh.svg"
+        }
       }
     ],
     "configuration": {
@@ -58,6 +109,16 @@
             }
           ],
           "description": "Regex rules mapping git branches to colors"
+        },
+        "gitBranchColor.statusBarIcon": {
+          "type": "string",
+          "default": "",
+          "description": "Icon before branch name in status bar. Leave empty to show only the branch name. Supports codicons like $(git-branch), $(rocket) or emoji."
+        },
+        "gitBranchColor.statusBarTextThemeColor": {
+          "type": "string",
+          "default": "",
+          "description": "Theme color token used for branch text in status bar (example: editor.foreground or statusBar.foreground). Leave empty to use the default status bar text color."
         }
       }
     }
