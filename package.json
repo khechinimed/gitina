@@ -3,7 +3,7 @@
   "displayName": "Gitina - Git Branch Colorizer",
   "description": "Color your VS Code interface by Git branch automatically. Define regex rules, get instant visual alerts on sensitive branches (main, production), disable rules on the fly, and share your team's color profile via a single JSON file.",
   "publisher": "khechinimohamed",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "engines": {
     "vscode": "^1.110.0"
   },
