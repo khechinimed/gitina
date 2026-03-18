@@ -7,6 +7,9 @@
   "engines": {
     "vscode": "^1.110.0"
   },
+  "sponsor": {
+    "url": "https://paypal.me/saccharina"
+  },
   "license": "MIT",
   "keywords": ["git", "branch", "colors", "github", "theme", "alerts"],
   "categories": [
