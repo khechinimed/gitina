@@ -7,11 +7,13 @@
   "engines": {
     "vscode": "^1.110.0"
   },
-  "keywords": ["git", "branch", "colors", "github", "theme", "ui"],
+  "license": "MIT",
+  "keywords": ["git", "branch", "colors", "github", "theme", "alerts"],
   "categories": [
-    "Other",
-     "SCM Providers"
+    "Visualization",
+    "Other"
   ],
+  "markdown": "github",
   "activationEvents": [
     "workspaceContains:.git",
     "onStartupFinished"
