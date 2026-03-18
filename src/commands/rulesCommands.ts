@@ -31,7 +31,7 @@ async function pickColor(): Promise<string | undefined> {
   quickPick.onDidChangeActive((items) => {
    const activeColor = items[0]?.color;
 
-   if (!activeColor) return;
+   if (!activeColor) { return; }
 
    void applyColor(activeColor);
   });
@@ -142,7 +142,7 @@ export async function addRuleWizard(): Promise<void> {
   },
  );
 
- if (!branchType) return;
+ if (!branchType) { return; }
 
  let pattern = branchType.pattern || "";
  let displayPattern = branchType.label;
@@ -153,7 +153,7 @@ export async function addRuleWizard(): Promise<void> {
    placeHolder: "example: sprint-42",
   });
 
-  if (!branchName) return;
+  if (!branchName) { return; }
 
   displayPattern = branchName;
   pattern = `^${escapeRegExp(branchName)}$`;
@@ -164,17 +164,17 @@ export async function addRuleWizard(): Promise<void> {
    prompt: "Enter regex for branch",
   });
 
-  if (!custom) return;
+  if (!custom) { return; }
 
   displayPattern = custom;
   pattern = custom;
  }
 
- if (!pattern) return;
+ if (!pattern) { return; }
 
  const color = await pickColor();
 
- if (!color) return;
+ if (!color) { return; }
 
  const rules = getConfiguredRules();
 
@@ -209,7 +209,7 @@ export async function removeRuleUI(): Promise<void> {
   },
  );
 
- if (!pick) return;
+ if (!pick) { return; }
 
  rules.splice(pick.index, 1);
 
@@ -221,12 +221,12 @@ export async function removeRuleUI(): Promise<void> {
 export async function editRuleColorUI(index: number): Promise<void> {
  const rules = getAllRules();
 
- if (index < 0 || index >= rules.length) return;
+ if (index < 0 || index >= rules.length) { return; }
 
  const rule = rules[index];
  const newColor = await pickColor();
 
- if (!newColor) return;
+ if (!newColor) { return; }
 
  rules[index] = { ...rule, color: newColor };
  await saveRules(rules);
@@ -236,7 +236,12 @@ export async function editRuleColorUI(index: number): Promise<void> {
 
 export async function manageSensitiveBranchesUI(): Promise<void> {
  const config = vscode.workspace.getConfiguration("gitBranchColor");
- const current = config.get<string[]>("sensitiveBranches", ["main", "production", "release"]);
+ const inspected = config.inspect<string[]>("sensitiveBranches");
+ const current: string[] =
+  inspected?.workspaceValue ??
+  inspected?.globalValue ??
+  inspected?.defaultValue ??
+  ["main", "production", "release"];
 
  const suggestions = ["main", "master", "production", "release", "staging", "develop"];
  const allLabels = Array.from(new Set([...suggestions, ...current]));
@@ -244,22 +249,23 @@ export async function manageSensitiveBranchesUI(): Promise<void> {
  const picks = await vscode.window.showQuickPick(
   allLabels.map((label) => ({
    label,
+   description: current.includes(label) ? "sensitive" : "",
    picked: current.includes(label),
   })),
   {
    canPickMany: true,
-   placeHolder: "Select branches to mark as sensitive (status bar warning)",
+   placeHolder: "Check = sensitive  •  Uncheck = not sensitive",
   },
  );
 
- if (!picks) { return; }
+ if (picks === undefined) { return; }
 
  const selected = picks.map((p) => p.label);
- await config.update("sensitiveBranches", selected, vscode.ConfigurationTarget.Global);
+ await config.update("sensitiveBranches", selected, vscode.ConfigurationTarget.Workspace);
 
  vscode.window.showInformationMessage(
   selected.length > 0
-   ? `Sensitive branches updated: ${selected.join(", ")}`
+   ? `Sensitive branches: ${selected.join(", ")}`
    : "No sensitive branches configured.",
  );
 }

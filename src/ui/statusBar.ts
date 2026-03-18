@@ -12,7 +12,8 @@ export function updateBranchStatus(
   statusItem.text = `⚠️ Sensitive branch:  ${branch}`;
   statusItem.backgroundColor = new vscode.ThemeColor("statusBarItem.warningBackground");
   statusItem.color = undefined;
+  statusItem.show();
+ } else {
+  statusItem.hide();
  }
-
- statusItem.show();
 }
