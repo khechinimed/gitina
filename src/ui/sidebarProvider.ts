@@ -92,6 +92,13 @@ export class GitinaSidebarProvider
                "gitBranchColor.removeRule",
                "gitinaActionRemoveRule",
             ),
+            createSidebarActionItem(
+               "Sensitive branches",
+               "Select which branches trigger a warning",
+               "shield",
+               "gitBranchColor.manageSensitiveBranches",
+               "gitinaActionSensitiveBranches",
+            ),
          ];
       }
 

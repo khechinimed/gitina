@@ -1,7 +1,9 @@
 import * as vscode from "vscode";
 import {
   addRuleWizard,
+  editRuleColorUI,
   listRulesUI,
+  manageSensitiveBranchesUI,
   removeRuleUI,
 } from "./commands/rulesCommands";
 import { getBranch } from "./services/gitService";
@@ -52,7 +54,7 @@ async function updateColor(force = false) {
     isSensitive,
   });
 
-  if (!force && branch === lastBranch && color === lastColor) return;
+  if (!force && branch === lastBranch && color === lastColor) { return; }
 
   lastBranch = branch;
   lastColor = color;
@@ -62,7 +64,7 @@ async function updateColor(force = false) {
 
 function isSensitiveBranch(branch: string): boolean {
   const config = vscode.workspace.getConfiguration("gitBranchColor");
-  if (!config.get<boolean>("sensitiveBranchesEnabled", true)) return false;
+  if (!config.get<boolean>("sensitiveBranchesEnabled", true)) { return false; }
   const patterns = config.get<string[]>("sensitiveBranches", ["main", "production", "release"]);
   return patterns.some((p) => {
     try { return new RegExp(`^${p}$`).test(branch); } catch { return branch === p; }
@@ -133,6 +135,14 @@ export function activate(context: vscode.ExtensionContext) {
     },
   );
 
+  const editRuleColorCommand = vscode.commands.registerCommand(
+    "gitBranchColor.editRuleColor",
+    async (item: RuleTreeItem) => {
+      await editRuleColorUI(item.ruleIndex);
+      await updateColor(true);
+    },
+  );
+
   const exportProfileCommand = vscode.commands.registerCommand(
     "gitBranchColor.exportProfile",
     exportProfile,
@@ -151,6 +161,14 @@ export function activate(context: vscode.ExtensionContext) {
     listRulesUI
   );
 
+  const manageSensitiveBranchesCommand = vscode.commands.registerCommand(
+    "gitBranchColor.manageSensitiveBranches",
+    async () => {
+      await manageSensitiveBranchesUI();
+      await updateColor(true);
+    },
+  );
+
   const configListener = vscode.workspace.onDidChangeConfiguration((e) => {
     if (e.affectsConfiguration("gitBranchColor")) {
       void updateColor(true);
@@ -166,9 +184,11 @@ export function activate(context: vscode.ExtensionContext) {
     removeRuleCommand,
     disableRuleCommand,
     enableRuleCommand,
+    editRuleColorCommand,
     exportProfileCommand,
     importProfileCommand,
     listRulesCommand,
+    manageSensitiveBranchesCommand,
     configListener,
   );
 }

@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { COLOR_PALETTE } from "../constants/colorPalette";
-import { getConfiguredRules, saveRules } from "../services/rulesService";
+import { getConfiguredRules, getAllRules, saveRules } from "../services/rulesService";
 import { applyColor } from "../theme/themeService";
 import { BranchRuleOption, ColorPickOption } from "../types";
 
@@ -216,6 +216,52 @@ export async function removeRuleUI(): Promise<void> {
  await saveRules(rules);
 
  vscode.window.showInformationMessage("Rule removed");
+}
+
+export async function editRuleColorUI(index: number): Promise<void> {
+ const rules = getAllRules();
+
+ if (index < 0 || index >= rules.length) return;
+
+ const rule = rules[index];
+ const newColor = await pickColor();
+
+ if (!newColor) return;
+
+ rules[index] = { ...rule, color: newColor };
+ await saveRules(rules);
+
+ vscode.window.showInformationMessage(`Rule updated: ${rule.pattern} → ${newColor}`);
+}
+
+export async function manageSensitiveBranchesUI(): Promise<void> {
+ const config = vscode.workspace.getConfiguration("gitBranchColor");
+ const current = config.get<string[]>("sensitiveBranches", ["main", "production", "release"]);
+
+ const suggestions = ["main", "master", "production", "release", "staging", "develop"];
+ const allLabels = Array.from(new Set([...suggestions, ...current]));
+
+ const picks = await vscode.window.showQuickPick(
+  allLabels.map((label) => ({
+   label,
+   picked: current.includes(label),
+  })),
+  {
+   canPickMany: true,
+   placeHolder: "Select branches to mark as sensitive (status bar warning)",
+  },
+ );
+
+ if (!picks) { return; }
+
+ const selected = picks.map((p) => p.label);
+ await config.update("sensitiveBranches", selected, vscode.ConfigurationTarget.Global);
+
+ vscode.window.showInformationMessage(
+  selected.length > 0
+   ? `Sensitive branches updated: ${selected.join(", ")}`
+   : "No sensitive branches configured.",
+ );
 }
 
 export async function listRulesUI(): Promise<void> {

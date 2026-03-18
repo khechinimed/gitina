@@ -5,7 +5,7 @@
   "publisher": "khechini mohamed",
   "version": "0.0.1",
   "engines": {
-    "vscode": "^1.80.0"
+    "vscode": "^1.110.0"
   },
   "keywords": ["git", "branch", "colors", "github", "theme", "ui"],
   "categories": [
@@ -17,14 +17,28 @@
     "onStartupFinished"
   ],
   "main": "./out/extension.js",
-  "icon": "media/sidebar-icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/khechinimed/gitina.git"
+  },
+  "homepage": "https://github.com/khechinimed/gitina#readme",
+  "icon": "media/icon/gitina_icon_marketplace.png",
+  "galleryBanner": {
+    "color": "#1f2328",
+    "theme": "dark"
+  },
+  "screenshots": [
+    "media/screenshots/sidebar.png",
+    "media/screenshots/status_bar_sensitive.png",
+    "media/screenshots/cmd_shift_p.png"
+  ],
   "contributes": {
     "viewsContainers": {
       "activitybar": [
         {
           "id": "gitBranchColorSidebar",
           "title": "Gitina",
-          "icon": "media/sidebar-icon.png"
+          "icon": "media/sidebar-view-icon.svg"
         }
       ]
     },
@@ -34,7 +48,7 @@
           "id": "gitBranchColor.sidebarView",
           "name": "Overview",
           "contextualTitle": "Gitina",
-          "icon": "media/sidebar-icon.png"
+          "icon": "media/sidebar-view-icon.svg"
         }
       ]
     },
@@ -68,14 +82,24 @@
       ],
       "view/item/context": [
         {
+          "command": "gitBranchColor.editRuleColor",
+          "when": "view == gitBranchColor.sidebarView && viewItem == gitinaRuleEnabled",
+          "group": "inline@1"
+        },
+        {
+          "command": "gitBranchColor.editRuleColor",
+          "when": "view == gitBranchColor.sidebarView && viewItem == gitinaRuleDisabled",
+          "group": "inline@1"
+        },
+        {
           "command": "gitBranchColor.disableRule",
           "when": "view == gitBranchColor.sidebarView && viewItem == gitinaRuleEnabled",
-          "group": "inline"
+          "group": "inline@2"
         },
         {
           "command": "gitBranchColor.enableRule",
           "when": "view == gitBranchColor.sidebarView && viewItem == gitinaRuleDisabled",
-          "group": "inline"
+          "group": "inline@2"
         }
       ]
     },
@@ -109,6 +133,16 @@
         }
       },
       {
+        "command": "gitBranchColor.editRuleColor",
+        "title": "Git Branch Color: Edit Rule Color",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "gitBranchColor.manageSensitiveBranches",
+        "title": "Git Branch Color: Manage Sensitive Branches",
+        "icon": "$(shield)"
+      },
+      {
         "command": "gitBranchColor.disableRule",
         "title": "Disable rule",
         "icon": "$(eye-closed)"
@@ -126,7 +160,10 @@
       {
         "command": "gitBranchColor.importProfile",
         "title": "Git Branch Color: Import Team Profile",
-        "icon": "$(import)"
+        "icon": {
+          "light": "media/commands/import-light.svg",
+          "dark": "media/commands/import-dark.svg"
+        }
       }
     ],
     "configuration": {
