@@ -11,7 +11,7 @@ import { getConfiguredRules, getAllRules, toggleRule } from "./services/rulesSer
 import { exportProfile, importProfile } from "./services/teamProfileService";
 import { GitinaSidebarProvider, RuleTreeItem } from "./ui/sidebarProvider";
 import { updateBranchStatus } from "./ui/statusBar";
-import { applyColor } from "./theme/themeService";
+import { applyColor, clearGitinaColors } from "./theme/themeService";
 
 let lastBranch: string | undefined;
 let lastColor: string | undefined;
@@ -193,4 +193,6 @@ export function activate(context: vscode.ExtensionContext) {
   );
 }
 
-export function deactivate() {}
+export async function deactivate(): Promise<void> {
+  await clearGitinaColors();
+}

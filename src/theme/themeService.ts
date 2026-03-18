@@ -1,5 +1,36 @@
 import * as vscode from "vscode";
 
+const GITINA_COLOR_KEYS = [
+ "statusBar.background",
+ "statusBar.noFolderBackground",
+ "statusBar.foreground",
+ "statusBar.noFolderForeground",
+ "titleBar.activeBackground",
+ "titleBar.inactiveBackground",
+ "titleBar.activeForeground",
+ "titleBar.inactiveForeground",
+ "activityBar.background",
+ "activityBar.foreground",
+ "activityBar.inactiveForeground",
+];
+
+export async function clearGitinaColors(): Promise<void> {
+ const config = vscode.workspace.getConfiguration();
+ const current =
+  config.get<Record<string, unknown>>("workbench.colorCustomizations") || {};
+ const cleaned = { ...current };
+
+ for (const key of GITINA_COLOR_KEYS) {
+  delete cleaned[key];
+ }
+
+ await config.update(
+  "workbench.colorCustomizations",
+  Object.keys(cleaned).length > 0 ? cleaned : undefined,
+  vscode.ConfigurationTarget.Workspace,
+ );
+}
+
 export function applyColor(color: string): Thenable<void> {
  const config = vscode.workspace.getConfiguration();
  const currentColors =
