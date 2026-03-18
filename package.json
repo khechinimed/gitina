@@ -84,16 +84,16 @@
         "command": "gitBranchColor.addRule",
         "title": "Git Branch Color: Add Rule",
         "icon": {
-          "light": "media/commands/add.svg",
-          "dark": "media/commands/add.svg"
+          "light": "media/commands/add-light.svg",
+          "dark": "media/commands/add-dark.svg"
         }
       },
       {
         "command": "gitBranchColor.removeRule",
         "title": "Git Branch Color: Remove Rule",
         "icon": {
-          "light": "media/commands/remove.svg",
-          "dark": "media/commands/remove.svg"
+          "light": "media/commands/remove-light.svg",
+          "dark": "media/commands/remove-dark.svg"
         }
       },
       {
@@ -104,8 +104,8 @@
         "command": "gitBranchColor.refresh",
         "title": "Git Branch Color: Refresh",
         "icon": {
-          "light": "media/commands/refresh.svg",
-          "dark": "media/commands/refresh.svg"
+          "light": "media/commands/refresh-light.svg",
+          "dark": "media/commands/refresh-dark.svg"
         }
       },
       {
