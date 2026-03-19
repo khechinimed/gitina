@@ -17,7 +17,9 @@ function execGit(cmd: string, cwd: string): Promise<string> {
 export async function getBranch(): Promise<string> {
  const folder = vscode.workspace.workspaceFolders?.[0];
 
- if (!folder) return "";
+ if (!folder) {
+  return "";
+ }
 
  return execGit("git rev-parse --abbrev-ref HEAD", folder.uri.fsPath);
 }

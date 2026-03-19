@@ -18,7 +18,9 @@ export async function exportProfile(): Promise<void> {
   title: "Export Gitina Team Profile",
  });
 
- if (!saveUri) return;
+ if (!saveUri) {
+  return;
+ }
 
  const rules = getAllRules();
  const content = JSON.stringify({ rules }, null, 2);
@@ -45,7 +47,9 @@ export async function importProfile(): Promise<void> {
  });
 
  const fileUri = uris?.[0];
- if (!fileUri) return;
+ if (!fileUri) {
+  return;
+ }
 
  let profile: { rules: BranchColorRule[] };
  try {

@@ -31,7 +31,9 @@ export async function saveRules(rules: BranchColorRule[]): Promise<void> {
 
 export async function toggleRule(index: number): Promise<void> {
  const rules = getAllRules();
- if (index < 0 || index >= rules.length) return;
+ if (index < 0 || index >= rules.length) {
+  return;
+ }
  const rule = rules[index];
  rules[index] = { ...rule, enabled: rule.enabled === false ? undefined : false };
  await saveRules(rules);
