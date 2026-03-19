@@ -11,7 +11,14 @@
     "url": "https://paypal.me/saccharina"
   },
   "license": "MIT",
-  "keywords": ["git", "branch", "colors", "github", "theme", "alerts"],
+  "keywords": [
+    "git",
+    "branch",
+    "colors",
+    "github",
+    "theme",
+    "alerts"
+  ],
   "categories": [
     "Visualization",
     "Other"
@@ -213,8 +220,14 @@
         },
         "gitBranchColor.sensitiveBranches": {
           "type": "array",
-          "items": { "type": "string" },
-          "default": ["main", "production", "release"],
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "main",
+            "production",
+            "release"
+          ],
           "description": "List of branch name patterns (regex anchored to full name) considered sensitive. A warning alert will be shown in the status bar and sidebar."
         }
       }
@@ -229,13 +242,13 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.110.0",
     "@types/mocha": "^10.0.10",
-    "@types/node": "22.x",
-    "typescript-eslint": "^8.56.1",
+    "@types/node": "^25.5.0",
+    "@types/vscode": "^1.110.0",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2",
     "eslint": "^9.39.3",
     "typescript": "^5.9.3",
-    "@vscode/test-cli": "^0.0.12",
-    "@vscode/test-electron": "^2.5.2"
+    "typescript-eslint": "^8.56.1"
   }
 }
