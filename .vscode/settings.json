@@ -20,5 +20,9 @@
 		"activityBar.background": "#130f40",
 		"activityBar.foreground": "#ffffff",
 		"activityBar.inactiveForeground": "#ffffffB3"
-	}
+	},
+	"gitBranchColor.sensitiveBranches": [
+		"main",
+		"release"
+	]
 }

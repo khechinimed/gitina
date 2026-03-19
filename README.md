@@ -218,9 +218,9 @@ This is the **only** setting Gitina ever writes to. It never touches your code, 
 
 ## Release Notes
 
-### 0.0.1
+### 0.1.0
 
-Initial release:
+Release 0.1.0:
 
 - Branch → color rules with regex matching
 - Sensitive branch alerts (configurable list, status bar warning)
